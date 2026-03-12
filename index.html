@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>餐厅报表手机清爽版</title>
+    <style>
+        :root { --primary: #007bff; --success: #28a745; --danger: #dc3545; --bg: #f4f6f9; }
+        body { font-family: -apple-system, system-ui, sans-serif; background: var(--bg); margin: 0; padding: 10px; color: #333; }
+        .container { max-width: 100%; margin: auto; background: white; padding: 15px; border-radius: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); box-sizing: border-box; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        h2 { font-size: 1.1rem; margin: 0; color: #1a1a1a; }
+        .clear-btn { background: var(--danger); color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: 0.8rem; font-weight: bold; }
+        
+        .section { margin-bottom: 12px; border-radius: 8px; padding: 10px; border: 1px solid #eee; background: #fff; }
+        .section-total { border-left: 4px solid #007bff; }
+        .section-fc { border-left: 4px solid #17a2b8; }
+        .section-mds { border-left: 4px solid #6f42c1; }
+        .section-cards { border-left: 4px solid #fd7e14; background: #fffaf5; }
+        
+        .section-title { font-weight: bold; margin-bottom: 10px; font-size: 0.85rem; color: #666; display: block; }
+        
+        .input-row { display: flex; gap: 8px; margin-bottom: 8px; }
+        .input-group { flex: 1; min-width: 0; }
+        
+        label { font-size: 0.7rem; color: #999; margin-bottom: 3px; display: block; white-space: nowrap; }
+        
+        input { 
+            width: 100%;
+            padding: 10px 5px; 
+            border: 1px solid #ddd; 
+            border-radius: 6px; 
+            font-size: 16px; 
+            background: #fafafa;
+            box-sizing: border-box;
+            -webkit-appearance: none;
+            text-align: center;
+        }
+        input:focus { border-color: var(--primary); outline: none; background: #fff; }
+
+        .btn-box { display: flex; flex-direction: column; gap: 8px; margin-top: 15px; }
+        button.action-btn { 
+            padding: 12px; 
+            border: none; 
+            border-radius: 8px; 
+            font-size: 1rem; 
+            font-weight: bold; 
+            color: white;
+            touch-action: manipulation;
+        }
+        .gen-btn { background: var(--primary); }
+        .copy-btn { background: var(--success); }
+        
+        #result { 
+            margin-top: 15px; 
+            padding: 12px; 
+            background: #2d3436; 
+            color: #dfe6e9; 
+            border-radius: 8px; 
+            white-space: pre-wrap; 
+            font-family: monospace; 
+            font-size: 13px; 
+            line-height: 1.4;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h2>餐厅经营报表</h2>
+        <button class="clear-btn" onclick="clearData()">清空数据</button>
+    </div>
+    
+    <div class="input-group" style="margin-bottom: 12px; padding: 0 5px;">
+        <label>餐厅编号</label>
+        <input type="text" id="storeID" value="5170029" style="text-align: left; padding-left: 10px;">
+    </div>
+
+    <div class="section section-total">
+        <span class="section-title">整体 (Total)</span>
+        <div class="input-row">
+            <div class="input-group"><label>今年销售</label><input type="number" inputmode="decimal" id="ty_s" placeholder=""></div>
+            <div class="input-group"><label>今年单数</label><input type="number" inputmode="numeric" id="ty_g" placeholder=""></div>
+        </div>
+        <div class="input-row">
+            <div class="input-group"><label>去年销售</label><input type="number" inputmode="decimal" id="ly_s" placeholder=""></div>
+            <div class="input-group"><label>去年单数</label><input type="number" inputmode="numeric" id="ly_g" placeholder=""></div>
+        </div>
+    </div>
+
+    <div class="section section-fc">
+        <span class="section-title">前台 (FC)</span>
+        <div class="input-row">
+            <div class="input-group"><label>今年销售</label><input type="number" inputmode="decimal" id="tfc_s" placeholder=""></div>
+            <div class="input-group"><label>今年单数</label><input type="number" inputmode="numeric" id="tfc_g" placeholder=""></div>
+        </div>
+        <div class="input-row">
+            <div class="input-group"><label>去年销售</label><input type="number" inputmode="decimal" id="lfc_s" placeholder=""></div>
+            <div class="input-group"><label>去年单数</label><input type="number" inputmode="numeric" id="lfc_g" placeholder=""></div>
+        </div>
+    </div>
+
+    <div class="section section-mds">
+        <span class="section-title">外送 (MDS)</span>
+        <div class="input-row">
+            <div class="input-group"><label>今年销售</label><input type="number" inputmode="decimal" id="tmds_s" placeholder=""></div>
+            <div class="input-group"><label>今年单数</label><input type="number" inputmode="numeric" id="tmds_g" placeholder=""></div>
+        </div>
+        <div class="input-row">
+            <div class="input-group"><label>去年销售</label><input type="number" inputmode="decimal" id="lmds_s" placeholder=""></div>
+            <div class="input-group"><label>去年单数</label><input type="number" inputmode="numeric" id="lmds_g" placeholder=""></div>
+        </div>
+    </div>
+
+    <div class="section section-cards">
+        <span class="section-title">会员与卡类</span>
+        <div class="input-row">
+            <div class="input-group"><label>会员数</label><input type="number" inputmode="numeric" id="vipCount" placeholder=""></div>
+            <div class="input-group"><label>App</label><input type="number" inputmode="numeric" id="appCount" placeholder=""></div>
+        </div>
+        <div class="input-row" style="margin-top: 8px;">
+            <div class="input-group"><label>早餐卡</label><input type="number" inputmode="numeric" id="bkCard" placeholder=""></div>
+            <div class="input-group"><label>职场卡</label><input type="number" inputmode="numeric" id="jobCard" placeholder=""></div>
+        </div>
+    </div>
+
+    <div class="btn-box">
+        <button class="action-btn gen-btn" onclick="calculate()">预览报表</button>
+        <button class="action-btn copy-btn" onclick="copyResult()">一键复制</button>
+    </div>
+    
+    <div id="result"></div>
+</div>
+
+<script>
+function clearData() {
+    if(confirm("确定要清空除编号外的数据吗？")) {
+        const ids = ['ty_s','ty_g','ly_s','ly_g','tfc_s','tfc_g','lfc_s','lfc_g','tmds_s','tmds_g','lmds_s','lmds_g','vipCount','bkCard','jobCard','appCount'];
+        ids.forEach(id => document.getElementById(id).value = "");
+        document.getElementById('result').style.display = 'none';
+        document.getElementById('result').innerText = "";
+    }
+}
+
+function calculate() {
+    const storeID = document.getElementById('storeID').value;
+    
+    // 助手函数：如果输入为空返回空字符串，否则返回数值
+    function getDisplayVal(id) {
+        const val = document.getElementById(id).value;
+        return val === "" ? "" : val;
+    }
+
+    const vipCount = getDisplayVal('vipCount');
+    const appCount = getDisplayVal('appCount');
+    const jobVal = getDisplayVal('jobCard');
+    const bkVal = getDisplayVal('bkCard');
+    
+    // 计算用的数值
+    const jobNum = parseFloat(jobVal) || 0;
+    const bkNum = parseFloat(bkVal) || 0;
+    
+    function getNum(id) { return parseFloat(document.getElementById(id).value) || 0; }
+    
+    function getComp(cur, prev) {
+        if (!prev || prev == 0) return "0%";
+        return Math.round((cur - prev) / prev * 100) + "%";
+    }
+
+    function processSet(cs, cg, ls, lg) {
+        let ty_ac = cg > 0 ? Math.round(cs / cg) : 0;
+        let ly_ac = lg > 0 ? Math.round(ls / lg) : 0;
+        return {
+            thisStr: `${cs}/${cg}/${ty_ac}`,
+            lastStr: `${ls}/${lg}/${ly_ac}`,
+            compS: getComp(cs, ls),
+            compG: getComp(cg, lg),
+            thisGC: cg
+        };
+    }
+
+    const total = processSet(getNum('ty_s'), getNum('ty_g'), getNum('ly_s'), getNum('ly_g'));
+    const fc = processSet(getNum('tfc_s'), getNum('tfc_g'), getNum('lfc_s'), getNum('lfc_g'));
+    const mds = processSet(getNum('tmds_s'), getNum('tmds_g'), getNum('lmds_s'), getNum('lmds_g'));
+
+    // 计算卡UPT
+    let uptDisplay = "";
+    if (fc.thisGC > 0 && (jobVal !== "" || bkVal !== "")) {
+        uptDisplay = Math.round((bkNum + jobNum) / fc.thisGC * 1000);
+    }
+
+    let res = `餐厅编号${storeID}
+今年sales：${total.thisStr}
+去年sales：${total.lastStr}
+CompSales：${total.compS}
+CompGC：${total.compG}
+今年FCsales：${fc.thisStr}
+去年FCsales：${fc.lastStr}
+CompSales：${fc.compS}
+CompGC：${fc.compG}
+今年MDSsales：${mds.thisStr}
+去年MDS sales：${mds.lastStr}
+CompSales：${mds.compS}
+CompGC：${mds.compG}
+会员：${vipCount}
+早餐卡：${bkVal}
+职场卡：${jobVal}
+卡UPT：${uptDisplay}
+App:${appCount}`;
+
+    const resDiv = document.getElementById('result');
+    resDiv.innerText = res;
+    resDiv.style.display = 'block';
+    resDiv.scrollIntoView({ behavior: 'smooth' });
+}
+
+function copyResult() {
+    const text = document.getElementById('result').innerText;
+    if(!text) {
+        alert("请先生成预览");
+        return;
+    }
+    navigator.clipboard.writeText(text).then(() => {
+        alert("复制成功！");
+    });
+}
+</script>
+
+</body>
+</html>
