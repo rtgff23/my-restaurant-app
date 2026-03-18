@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>报数工具</title>
+    <style>
+        :root { --primary: #007bff; --success: #28a745; --info: #17a2b8; --danger: #dc3545; --bg: #f4f6f9; }
+        body { font-family: -apple-system, system-ui, sans-serif; background: var(--bg); margin: 0; padding: 10px; color: #333; }
+        .container { max-width: 100%; margin: auto; background: white; padding: 15px; border-radius: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); box-sizing: border-box; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        h2 { font-size: 1.1rem; margin: 0; color: #1a1a1a; }
+        .clear-btn { background: var(--danger); color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: 0.8rem; font-weight: bold; }
+        
+        .section { margin-bottom: 12px; border-radius: 8px; padding: 10px; border: 1px solid #eee; background: #fff; }
+        .section-total { border-left: 4px solid var(--primary); }
+        .section-fc { border-left: 4px solid var(--info); }
+        .section-mds { border-left: 4px solid #6f42c1; }
+        .section-cards { border-left: 4px solid #fd7e14; background: #fffaf5; }
+        
+        .section-title { font-weight: bold; margin-bottom: 10px; font-size: 0.85rem; color: #666; display: block; }
+        .input-row { display: flex; gap: 8px; margin-bottom: 8px; }
+        .input-group { flex: 1; min-width: 0; }
+        label { font-size: 0.7rem; color: #999; margin-bottom: 3px; display: block; }
+        
+        input { 
+            width: 100%; padding: 10px 5px; border: 1px solid #ddd; border-radius: 6px; 
+            font-size: 16px; background: #fafafa; box-sizing: border-box; text-align: center;
+        }
+        input:focus { border-color: var(--primary); outline: none; background: #fff; }
+
+        .btn-box { display: flex; flex-direction: column; gap: 8px; margin-top: 15px; }
+        button.action-btn { padding: 12px; border: none; border-radius: 8px; font-size: 0.95rem; font-weight: bold; color: white; touch-action: manipulation; }
+        .gen-btn-simple { background: var(--info); }
+        .gen-btn-detail { background: var(--primary); }
+        .copy-btn { background: var(--success); }
+        
+        #result { 
+            margin-top: 15px; padding: 12px; background: #2d3436; color: #dfe6e9; 
+            border-radius: 8px; white-space: pre-wrap; font-family: monospace; font-size: 14px; line-height: 1.6; display: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h2>餐厅报数工具</h2>
+        <button class="clear-btn" onclick="clearData()">清空数据</button>
+    </div>
+    
+    <div class="input-row">
+        <div class="input-group"><label>餐厅编号</label><input type="text" id="storeID" value="5170029"></div>
+        <div class="input-group"><label>餐厅名称</label><input type="text" id="storeName" value="吾悦广场餐厅"></div>
+    </div>
+
+    <div class="section section-total">
+        <span class="section-title">ALL</span>
+        <div class="input-row">
+            <div class="input-group"><label>今年销售</label><input type="number" inputmode="decimal" id="ty_s"></div>
+            <div class="input-group"><label>今年单数</label><input type="number" inputmode="numeric" id="ty_g"></div>
+        </div>
+        <div class="input-row">
+            <div class="input-group"><label>去年销售</label><input type="number" inputmode="decimal" id="ly_s"></div>
+            <div class="input-group"><label>去年单数</label><input type="number" inputmode="numeric" id="ly_g"></div>
+        </div>
+    </div>
+
+    <div class="section section-fc">
+        <span class="section-title">FC</span>
+        <div class="input-row">
+            <div class="input-group"><label>今年销售</label><input type="number" inputmode="decimal" id="tfc_s"></div>
+            <div class="input-group"><label>今年单数</label><input type="number" inputmode="numeric" id="tfc_g"></div>
+        </div>
+        <div class="input-row">
+            <div class="input-group"><label>去年销售</label><input type="number" inputmode="decimal" id="lfc_s"></div>
+            <div class="input-group"><label>去年单数</label><input type="number" inputmode="numeric" id="lfc_g"></div>
+        </div>
+    </div>
+
+    <div class="section section-mds">
+        <span class="section-title">MDS </span>
+        <div class="input-row">
+            <div class="input-group"><label>今年销售</label><input type="number" inputmode="decimal" id="tmds_s"></div>
+            <div class="input-group"><label>今年单数</label><input type="number" inputmode="numeric" id="tmds_g"></div>
+        </div>
+        <div class="input-row">
+            <div class="input-group"><label>去年销售</label><input type="number" inputmode="decimal" id="lmds_s"></div>
+            <div class="input-group"><label>去年单数</label><input type="number" inputmode="numeric" id="lmds_g"></div>
+        </div>
+    </div>
+
+    <div class="section section-cards">
+        <span class="section-title">会员与卡类</span>
+        <div class="input-row">
+            <div class="input-group"><label>会员数</label><input type="number" id="vipCount"></div>
+            <div class="input-group"><label>APP下单</label><input type="number" id="appCount"></div>
+        </div>
+        <div class="input-row">
+            <div class="input-group"><label>早餐卡</label><input type="number" id="bkCard"></div>
+            <div class="input-group"><label>职场卡</label><input type="number" id="jobCard"></div>
+        </div>
+        <div class="input-group" style="margin-top: 8px;">
+            <label>值班经理 </label>
+            <input type="text" id="manager" placeholder="输入姓名">
+        </div>
+    </div>
+
+    <div class="btn-box">
+        <button class="action-btn gen-btn-simple" onclick="generateSimple()">生成简版报数</button>
+        <button class="action-btn gen-btn-detail" onclick="generateDetail()">生成详细报数</button>
+        <button class="action-btn copy-btn" onclick="copyResult()">一键复制结果</button>
+    </div>
+    
+    <div id="result"></div>
+</div>
+
+<script>
+const getVal = (id) => document.getElementById(id).value;
+const getNum = (id) => parseFloat(document.getElementById(id).value) || 0;
+
+function clearData() {
+    if(confirm("确定清空数据吗？")) {
+        const ids = ['ty_s','ty_g','ly_s','ly_g','tfc_s','tfc_g','lfc_s','lfc_g','tmds_s','tmds_g','lmds_s','lmds_g','vipCount','appCount','jobCard','bkCard','manager'];
+        ids.forEach(id => document.getElementById(id).value = "");
+        document.getElementById('result').style.display = 'none';
+    }
+}
+
+function generateSimple() {
+    const storeID = getVal('storeID'), storeName = getVal('storeName');
+    const vip = getVal('vipCount'), app = getVal('appCount'), manager = getVal('manager');
+    const bk = getNum('bkCard'), job = getNum('jobCard');
+    const ohTotal = bk + job;
+    
+    let upt = "";
+    if (getNum('tfc_g') > 0 && (bk !== 0 || job !== 0)) {
+        upt = Math.round(ohTotal / getNum('tfc_g') * 1000);
+    }
+
+    let res = `${storeID} ${storeName}\n`;
+    res += `ALL 营业额${getVal('ty_s')}GC${getVal('ty_g')}\n`;
+    res += `FC  营业额${getVal('tfc_s')}GC${getVal('tfc_g')}\n`;
+    res += `MDS 营业额${getVal('tmds_s')}GC${getVal('tmds_g')}\n`;
+    res += `会员:${vip}\n`;
+    res += `OH卡:${ohTotal}UPT :${upt}\n`;
+    res += `APP ：${app}\n`;
+    res += `值班经理:${manager}`;
+
+    showResult(res);
+}
+
+function generateDetail() {
+    function getComp(cur, prev) {
+        if (!prev || prev == 0) return "0%";
+        return Math.round((cur - prev) / prev * 100) + "%";
+    }
+    function processSet(cs, cg, ls, lg) {
+        let ty_ac = cg > 0 ? Math.round(cs / cg) : "";
+        let ly_ac = lg > 0 ? Math.round(ls / lg) : "";
+        return {
+            thisStr: `${cs}/${cg}/${ty_ac}`,
+            lastStr: `${ls}/${lg}/${ly_ac}`,
+            compS: getComp(cs, ls),
+            compG: getComp(cg, lg)
+        };
+    }
+
+    const total = processSet(getNum('ty_s'), getNum('ty_g'), getNum('ly_s'), getNum('ly_g'));
+    const fc = processSet(getNum('tfc_s'), getNum('tfc_g'), getNum('lfc_s'), getNum('lfc_g'));
+    const mds = processSet(getNum('tmds_s'), getNum('tmds_g'), getNum('lmds_s'), getNum('lmds_g'));
+
+    const bkNum = getNum('bkCard'), jobNum = getNum('jobCard');
+    let upt = getNum('tfc_g') > 0 ? Math.round((bkNum + jobNum) / getNum('tfc_g') * 1000) : "";
+
+    let res = `餐厅编号${getVal('storeID')}\n`;
+    res += `今年sales：${total.thisStr}\n去年sales：${total.lastStr}\nCompSales：${total.compS}\nCompGC：${total.compG}\n`;
+    res += `今年FCsales：${fc.thisStr}\n去年FCsales：${fc.lastStr}\nCompSales：${fc.compS}\nCompGC：${fc.compG}\n`;
+    res += `今年MDSsales：${mds.thisStr}\n去年MDS sales：${mds.lastStr}\nCompSales：${mds.compS}\nCompGC：${mds.compG}\n`;
+    res += `会员：${getVal('vipCount')}\n早餐卡：${getVal('bkCard')}\n职场卡：${getVal('jobCard')}\n卡UPT：${upt}\nApp:${getVal('appCount')}`;
+
+    showResult(res);
+}
+
+function showResult(text) {
+    const resDiv = document.getElementById('result');
+    resDiv.innerText = text;
+    resDiv.style.display = 'block';
+    resDiv.scrollIntoView({ behavior: 'smooth' });
+}
+
+function copyResult() {
+    const text = document.getElementById('result').innerText;
+    if(!text) return alert("请先生成报表");
+    navigator.clipboard.writeText(text).then(() => alert("报表已复制！"));
+}
+</script>
+</body>
+</html>
